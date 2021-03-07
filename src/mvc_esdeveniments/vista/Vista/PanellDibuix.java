@@ -126,12 +126,12 @@ public class PanellDibuix extends JPanel implements MouseListener {
         gr2.draw(ejeX);
         gr2.draw(ejeY);
 
-        pintarTusPutosMuertos(computacionalOn, gr2);
-        pintarTusPutosMuertos(computacionalOn2, gr2);
-        pintarTusPutosMuertos(computacionalOn3, gr2);
+        pintarGraficas(computacionalOn, gr2);
+        pintarGraficas(computacionalOn2, gr2);
+        pintarGraficas(computacionalOn3, gr2);
     }
 
-    public void pintarTusPutosMuertos(Point[] puntos, Graphics2D gr2) {
+    public void pintarGraficas(Point[] puntos, Graphics2D gr2) {
         for (int i = 0; i < puntos.length; i++) {
             int x = puntos[i].x;
             int y = puntos[i].y;
