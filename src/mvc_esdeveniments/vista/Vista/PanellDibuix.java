@@ -13,6 +13,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import mvc_esdeveniments.MeuError;
@@ -28,7 +29,7 @@ public class PanellDibuix extends JPanel implements MouseListener {
     private int h;
     private Model mod;
     private Vista vis;
-    protected final int FPS = 60;  // 24 frames per segon
+    protected final int FPS = 24;  // 24 frames per segon
     private final ProcesPintat procpin;
     private BufferedImage bima;
 
@@ -39,10 +40,13 @@ public class PanellDibuix extends JPanel implements MouseListener {
     private final int ESPACIOPUNTO3 = 15;
     private final int NUMELE = 15;
 
-    private Point computacionalOn[];
-    private Point computacionalOn2[];
-    private Point computacionalOn3[];
+    private Point2D computacionalOn[];
+    private Point2D computacionalOn2[];
+    private Point2D computacionalOn3[];
 
+    double factorEscaladoX = 0;
+    double factorEscaladoY = 0;
+    
     public PanellDibuix(int x, int y, Model m, Vista v) {
         w = x;
         h = y;
@@ -53,12 +57,13 @@ public class PanellDibuix extends JPanel implements MouseListener {
         this.setPreferredSize(new Dimension(w, h));
         procpin = new ProcesPintat(this);
         procpin.start();
-        this.llenarOdeN();
-        this.llenarOdeN2();
-        this.llenarOdeLogN();
+        factorEscaladoX = (double) (this.w - PADDING) /(double) mod.getELEMENTS();
+        //  this.llenarOdeN();
+        //  this.llenarOdeN2();
+        //  this.llenarOdeLogN();
     }
 
-    public void llenarOdeN() {
+    /*  public void llenarOdeN() {
         computacionalOn = new Point[NUMELE];
         for (int i = 0; i < computacionalOn.length; i++) {
             computacionalOn[i] = new Point(PADDING + i * ESPACIOPUNTO, this.h - PADDING - i * ESPACIOPUNTO);
@@ -77,6 +82,15 @@ public class PanellDibuix extends JPanel implements MouseListener {
         for (int i = 0; i < computacionalOn3.length; i++) {
             computacionalOn3[i] = new Point(PADDING + i * ESPACIOPUNTO3, (int) (this.h - PADDING - Math.log(i) * ESPACIOPUNTO3));
         }
+    }
+     */
+    public void llenarGraficas() {
+
+        computacionalOn = mod.lineal();
+        
+        computacionalOn2 = mod.cuadratic();
+        factorEscaladoY = (double) (this.h - PADDING) /(double)  1000;
+        this.repaint();
     }
 
     @Override
@@ -126,21 +140,37 @@ public class PanellDibuix extends JPanel implements MouseListener {
         gr2.draw(ejeX);
         gr2.draw(ejeY);
 
+        gr2.setColor(Color.red);
         pintarGraficas(computacionalOn, gr2);
+        gr2.setColor(Color.green);
         pintarGraficas(computacionalOn2, gr2);
-        pintarGraficas(computacionalOn3, gr2);
+        //   pintarGraficas(computacionalOn3, gr2);
     }
 
-    public void pintarGraficas(Point[] puntos, Graphics2D gr2) {
+    public int pintarGraficas(Point2D[] puntos, Graphics2D gr2) {
+
+        if (factorEscaladoY ==0) {
+            System.out.println("Fuera");
+            return -1;
+        }
+        
+      /*  for(int k = 0 ;k < puntos.length;k++){
+            System.out.println("elem: "+puntos[k].getX() + " t: " + puntos[k].getY());
+        }*/
+        double inversionY = this.h - PADDING;
+
+
+
         for (int i = 0; i < puntos.length; i++) {
-            int x = puntos[i].x;
-            int y = puntos[i].y;
-            gr2.fillRect(x - TAMPUNTO / 2, y - TAMPUNTO / 2, TAMPUNTO, TAMPUNTO);
+            double x = puntos[i].getX();
+            double y = puntos[i].getY();
+           // gr2.fillRect(x - TAMPUNTO / 2, y - TAMPUNTO / 2, TAMPUNTO, TAMPUNTO);
             if ((i + 1) < puntos.length) {
-                Line2D linea = new Line2D.Double(x, y, puntos[i + 1].x, puntos[i + 1].y);
+                Line2D.Double linea = new Line2D.Double((double) x * factorEscaladoX + PADDING, inversionY -(double) y * factorEscaladoY,(double) puntos[i + 1].getX() * factorEscaladoX+PADDING, inversionY - (double)puntos[i + 1].getY() * factorEscaladoY);
                 gr2.draw(linea);
             }
         }
+        return 0;
     }
 
 }
@@ -156,9 +186,14 @@ class ProcesPintat extends Thread {
     public void run() {
         long temps = System.nanoTime();
         long tram = 1000000000L / pan.FPS;
+        boolean done = false;
         while (true) {
             if ((System.nanoTime() - temps) > tram) {
                 pan.repaint();
+                if (!done) {
+                    pan.llenarGraficas();
+                    done = true;
+                }
                 temps = System.nanoTime();
                 espera((long) (tram / 2000000));
             }
