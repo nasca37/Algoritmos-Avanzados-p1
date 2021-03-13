@@ -23,7 +23,7 @@ public class Model implements PerEsdeveniments {
     //private Point computacionalOn2[];
     //private Point computacionalOn3[];
 
-    private final int NUMPOINTS = 10;
+    private final int NUMPOINTS = 15;
     private final int ELEMENTS = 100;
 
     public Model(MVC_Esdeveniments p) {
@@ -57,7 +57,7 @@ public class Model implements PerEsdeveniments {
 
     public double cuadratic(int n) {
         double startTime = System.nanoTime();
-        for (int i = 0; i < n; i++) {
+        for (int k = 0; k < n; k++) {
             for (int j = 0; j < n; j++) {
                 try {
                     Thread.sleep(0, 1);
@@ -77,11 +77,11 @@ public class Model implements PerEsdeveniments {
         Point2D[] computacionalOn2 = new Point2D[NUMPOINTS];
         computacionalOn2[0] = new Point2D.Double(0, 0);
         int numLength = 1;
-        boolean firstTime = true;
+
         for (int i = 1; i < NUMPOINTS; i++) {
-            double time = cuadratic(i * (ELEMENTS/NUMPOINTS));
-            computacionalOn2[numLength++] = new Point2D.Double(i, (time / 10000000));
-            firstTime = false;
+            int numElementsActual = i * (ELEMENTS / NUMPOINTS);
+            double time = cuadratic(numElementsActual);
+            computacionalOn2[numLength++] = new Point2D.Double(numElementsActual, (time / 10000000));
             System.out.println("Lmao num elem: " + i);
 
         }
@@ -89,6 +89,45 @@ public class Model implements PerEsdeveniments {
         System.out.println(
                 "cuadractic end");
         return computacionalOn2;
+    }
+
+    public double logaritmic(int n) {
+        double startTime = System.nanoTime();
+        int logScale = (int) Math.ceil(Math.log(n));
+        for (int k = 0; k < n; k++) {
+
+            for (int j = 0; j < logScale; j++) {
+                try {
+                    Thread.sleep(0, 1);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }
+        }
+
+        return System.nanoTime() - startTime;
+
+    }
+
+    public Point2D[] logaritmic() {
+
+        Point2D[] computacionalOn3 = new Point2D[NUMPOINTS];
+        computacionalOn3[0] = new Point2D.Double(0, 0);
+        int numLength = 1;
+
+        for (int i = 1; i < NUMPOINTS; i++) {
+            int numElementsActual = i * (ELEMENTS / NUMPOINTS);
+            double time = logaritmic(numElementsActual);
+            computacionalOn3[numLength++] = new Point2D.Double(numElementsActual, (time / 10000000));
+
+            System.out.println("Lmao num elem: " + i);
+
+        }
+
+        System.out.println(
+                "cuadractic end");
+        return computacionalOn3;
     }
 
     public MVC_Esdeveniments getProg() {

@@ -34,11 +34,6 @@ public class PanellDibuix extends JPanel implements MouseListener {
     private BufferedImage bima;
 
     private final int PADDING = 10;
-    private final int TAMPUNTO = 5;
-    private final int ESPACIOPUNTO = 20;
-    private final int ESPACIOPUNTO2 = 5;
-    private final int ESPACIOPUNTO3 = 15;
-    private final int NUMELE = 15;
 
     private Point2D computacionalOn[];
     private Point2D computacionalOn2[];
@@ -89,7 +84,8 @@ public class PanellDibuix extends JPanel implements MouseListener {
         computacionalOn = mod.lineal();
         
         computacionalOn2 = mod.cuadratic();
-        factorEscaladoY = (double) (this.h - PADDING) /(double)  1000;
+        computacionalOn3 = mod.logaritmic();
+        factorEscaladoY = (double) (this.h - PADDING) /(double)  300;
         this.repaint();
     }
 
@@ -144,7 +140,8 @@ public class PanellDibuix extends JPanel implements MouseListener {
         pintarGraficas(computacionalOn, gr2);
         gr2.setColor(Color.green);
         pintarGraficas(computacionalOn2, gr2);
-        //   pintarGraficas(computacionalOn3, gr2);
+        gr2.setColor(Color.blue);
+        pintarGraficas(computacionalOn3, gr2);
     }
 
     public int pintarGraficas(Point2D[] puntos, Graphics2D gr2) {
@@ -153,10 +150,7 @@ public class PanellDibuix extends JPanel implements MouseListener {
             System.out.println("Fuera");
             return -1;
         }
-        
-      /*  for(int k = 0 ;k < puntos.length;k++){
-            System.out.println("elem: "+puntos[k].getX() + " t: " + puntos[k].getY());
-        }*/
+
         double inversionY = this.h - PADDING;
 
 
@@ -164,7 +158,6 @@ public class PanellDibuix extends JPanel implements MouseListener {
         for (int i = 0; i < puntos.length; i++) {
             double x = puntos[i].getX();
             double y = puntos[i].getY();
-           // gr2.fillRect(x - TAMPUNTO / 2, y - TAMPUNTO / 2, TAMPUNTO, TAMPUNTO);
             if ((i + 1) < puntos.length) {
                 Line2D.Double linea = new Line2D.Double((double) x * factorEscaladoX + PADDING, inversionY -(double) y * factorEscaladoY,(double) puntos[i + 1].getX() * factorEscaladoX+PADDING, inversionY - (double)puntos[i + 1].getY() * factorEscaladoY);
                 gr2.draw(linea);
