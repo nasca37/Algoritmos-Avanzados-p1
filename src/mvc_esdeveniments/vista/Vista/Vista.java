@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -22,7 +23,7 @@ import mvc_esdeveniments.PerEsdeveniments;
  *
  * @author mascport
  */
-public class Vista extends JFrame implements ActionListener, PerEsdeveniments, ChangeListener {
+public class Vista extends JFrame implements ActionListener, PerEsdeveniments {
 
     private MVC_Esdeveniments prog;
 
@@ -34,16 +35,25 @@ public class Vista extends JFrame implements ActionListener, PerEsdeveniments, C
         JButton boto1 = new JButton("Arrancar");
         boto1.addActionListener(this);
         bots.add(boto1);
-        JButton boto2 = new JButton("Parar");
+        JButton boto2 = new JButton("Reset");
         boto2.addActionListener(this);
         bots.add(boto2);
         this.add(BorderLayout.NORTH, bots);
         PanellDibuix panell = new PanellDibuix(800, 400, prog.getModel(), this);
+        JCheckBox lineal = new JCheckBox("O(n)");
+        JCheckBox cuadratic = new JCheckBox("O(n^2)");
+        JCheckBox logaritmic = new JCheckBox("O(n x log(n))");
+        lineal.setSelected(true);
+        cuadratic.setSelected(true);
+        logaritmic.setSelected(true);
+        lineal.addActionListener(this);
+        cuadratic.addActionListener(this);
+        logaritmic.addActionListener(this);
+        
+        bots.add(lineal);
+        bots.add(cuadratic);
+        bots.add(logaritmic);
         this.add(BorderLayout.CENTER, panell);
-        JSlider barra = new JSlider(1, 70, 7);
-        barra.setOpaque(true);
-        barra.addChangeListener(this);
-        this.add(BorderLayout.SOUTH, barra);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -69,13 +79,6 @@ public class Vista extends JFrame implements ActionListener, PerEsdeveniments, C
 
     @Override
     public void notificar(String s) {
-        if (s.startsWith("Picat:")) {
-            prog.notificar(s);
-        }
     }
 
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        prog.notificar("Velocitat:" + ((JSlider) e.getSource()).getValue());
-    }
 }

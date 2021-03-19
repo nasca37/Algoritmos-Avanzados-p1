@@ -25,8 +25,9 @@ public class Control extends Thread implements PerEsdeveniments {
     public void run() {
         seguir = true;
         while (seguir) {
-            prog.getModel().notificar("IncGrau");
+            prog.getModel().notificar("dibuixar");
             espera(1000 / 25, 0);
+            seguir = false;
         }
     }
 
@@ -40,7 +41,7 @@ public class Control extends Thread implements PerEsdeveniments {
 
     @Override
     public void notificar(String s) {
-        if (s.startsWith("Parar")) {
+        if (s.startsWith("Reset")) {
             seguir = false;
         } else if (s.startsWith("Arrancar")) {
             this.start();

@@ -23,13 +23,13 @@ import mvc_esdeveniments.model.Model;
  *
  * @author mascport
  */
-public class PanellDibuix extends JPanel implements MouseListener {
+public class PanellDibuix extends JPanel {
 
     private int w;
     private int h;
     private Model mod;
     private Vista vis;
-    protected final int FPS = 24;  // 24 frames per segon
+    protected final int FPS = 1;  // 24 frames per segon
     private final ProcesPintat procpin;
     private BufferedImage bima;
 
@@ -41,78 +41,30 @@ public class PanellDibuix extends JPanel implements MouseListener {
 
     double factorEscaladoX = 0;
     double factorEscaladoY = 0;
-    
+
     public PanellDibuix(int x, int y, Model m, Vista v) {
         w = x;
         h = y;
         mod = m;
         vis = v;
         bima = null;
-        this.addMouseListener(this);
         this.setPreferredSize(new Dimension(w, h));
         procpin = new ProcesPintat(this);
         procpin.start();
-        factorEscaladoX = (double) (this.w - PADDING) /(double) mod.getELEMENTS();
-        //  this.llenarOdeN();
-        //  this.llenarOdeN2();
-        //  this.llenarOdeLogN();
+
     }
 
-    /*  public void llenarOdeN() {
-        computacionalOn = new Point[NUMELE];
-        for (int i = 0; i < computacionalOn.length; i++) {
-            computacionalOn[i] = new Point(PADDING + i * ESPACIOPUNTO, this.h - PADDING - i * ESPACIOPUNTO);
-        }
-    }
-
-    public void llenarOdeN2() {
-        computacionalOn2 = new Point[NUMELE];
-        for (int i = 0; i < computacionalOn2.length; i++) {
-            computacionalOn2[i] = new Point(PADDING + i * ESPACIOPUNTO2, this.h - PADDING - i * i * ESPACIOPUNTO2);
-        }
-    }
-
-    public void llenarOdeLogN() {
-        computacionalOn3 = new Point[NUMELE];
-        for (int i = 0; i < computacionalOn3.length; i++) {
-            computacionalOn3[i] = new Point(PADDING + i * ESPACIOPUNTO3, (int) (this.h - PADDING - Math.log(i) * ESPACIOPUNTO3));
-        }
-    }
-     */
     public void llenarGraficas() {
 
-        computacionalOn = mod.lineal();
-        
-        computacionalOn2 = mod.cuadratic();
-        computacionalOn3 = mod.logaritmic();
-        factorEscaladoY = (double) (this.h - PADDING) /(double)  300;
+        computacionalOn = mod.getComputacionalOn();
+
+        computacionalOn2 = mod.getComputacionalOn2();
+        computacionalOn3 = mod.getComputacionalOn3();
+        factorEscaladoX = (double) (this.w - PADDING) / (double) mod.getELEMENTS();
+        factorEscaladoY = (double) (this.h - PADDING) / (double) 300;
         this.repaint();
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        vis.notificar("Picat:" + e.getX() + "," + e.getY());
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        ;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        ;
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        ;
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        ;
-    }
 
     public void repaint() {
         if (this.getGraphics() != null) {
@@ -145,25 +97,45 @@ public class PanellDibuix extends JPanel implements MouseListener {
     }
 
     public int pintarGraficas(Point2D[] puntos, Graphics2D gr2) {
-
-        if (factorEscaladoY ==0) {
-            System.out.println("Fuera");
+        if(puntos == null){
             return -1;
+        }
+        if (puntos[0] == null) {
+            return -1;
+        } else {
+            System.out.println(puntos.length);
         }
 
         double inversionY = this.h - PADDING;
 
-
-
-        for (int i = 0; i < puntos.length; i++) {
+        for (int i = 0; i <numElements(puntos); i++) {
+            System.out.println(i);
             double x = puntos[i].getX();
             double y = puntos[i].getY();
             if ((i + 1) < puntos.length) {
-                Line2D.Double linea = new Line2D.Double((double) x * factorEscaladoX + PADDING, inversionY -(double) y * factorEscaladoY,(double) puntos[i + 1].getX() * factorEscaladoX+PADDING, inversionY - (double)puntos[i + 1].getY() * factorEscaladoY);
-                gr2.draw(linea);
+                if (puntos[i + 1] != null) {
+                    Line2D.Double linea = new Line2D.Double((double) x * factorEscaladoX + PADDING, inversionY - (double) y * factorEscaladoY, (double) puntos[i + 1].getX() * factorEscaladoX + PADDING, inversionY - (double) puntos[i + 1].getY() * factorEscaladoY);
+                    gr2.draw(linea);
+                }
+
+            }
+
+        }
+
+        return 0;
+    }
+
+    public int numElements(Point2D[] array) {
+        int numElements = 0;
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] != null) {
+                numElements++;
+            }else{
+                return numElements;
             }
         }
-        return 0;
+        return numElements;
     }
 
 }
@@ -179,14 +151,11 @@ class ProcesPintat extends Thread {
     public void run() {
         long temps = System.nanoTime();
         long tram = 1000000000L / pan.FPS;
-        boolean done = false;
         while (true) {
             if ((System.nanoTime() - temps) > tram) {
-                pan.repaint();
-                if (!done) {
-                    pan.llenarGraficas();
-                    done = true;
-                }
+
+                pan.llenarGraficas();
+
                 temps = System.nanoTime();
                 espera((long) (tram / 2000000));
             }

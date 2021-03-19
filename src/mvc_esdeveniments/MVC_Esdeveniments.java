@@ -25,7 +25,7 @@ public class MVC_Esdeveniments implements PerEsdeveniments {
     private void inicio() {
         mod = new Model(this);
         con = null;
-        vis = new Vista("Exemple de MVC + Patró Esdeveniments", this);
+        vis = new Vista("Coste computacional", this);
         vis.mostrar();
     }
 
@@ -43,25 +43,26 @@ public class MVC_Esdeveniments implements PerEsdeveniments {
                 con = new Control(this);
                 con.notificar(s);
             }
-        } else if (s.startsWith("Parar")) {
+        } else if (s.startsWith("Reset")) {
             if (con != null) {
+                mod.vaciarArrays();
                 con.notificar(s);
                 con = null;
             }
-        } else if (s.startsWith("Picat:")) {
-            s = s.substring(s.indexOf(":") + 1);
-            int x = Integer.parseInt(s.substring(0, s.indexOf(",")));
-            int y = Integer.parseInt(s.substring(s.indexOf(",") + 1));
+        } else if (s.startsWith("O(n)")) {
+            mod.setLineal(!mod.isLineal());
+        } else if (s.startsWith("O(n^2)")) {
+            mod.setCuadratic(!mod.isCuadratic());
 
-        } else if (s.startsWith("Velocitat:")) {
-            int v = Integer.parseInt(s.substring(s.indexOf(":") + 1));
-
+        } else if (s.startsWith("O(n x log(n))")) {
+            mod.setLogartimic(!mod.isLogartimic());
         }
+
     }
 
     /*
         Mètode public de retorn de la instància del model de dades
-    */
+     */
     public Model getModel() {
         return mod;
     }

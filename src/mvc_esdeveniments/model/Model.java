@@ -26,32 +26,50 @@ public class Model implements PerEsdeveniments {
     private final int NUMPOINTS = 15;
     private final int ELEMENTS = 100;
 
+    private Point2D[] computacionalOn;
+    private Point2D[] computacionalOn2;
+    private Point2D[] computacionalOn3;
+
+    private boolean lineal = true;
+    private boolean cuadratic = true;
+    private boolean logartimic = true;
+    
+    private boolean dibujando = false;
     public Model(MVC_Esdeveniments p) {
         prog = p;
-
+        computacionalOn = new Point2D[NUMPOINTS];
+        computacionalOn2 = new Point2D[NUMPOINTS];
+        computacionalOn3 = new Point2D[NUMPOINTS];
     }
 
-    public Point2D[] lineal() {
-
-        Point2D[] computacionalOn = new Point2D[NUMPOINTS];
-        computacionalOn[0] = new Point2D.Double(0, 0);
+    public double lineal(int n) {
         double startTime = System.nanoTime();
-        double actualTime = 0;
-        int numLength = 1;
-        for (int i = 0; i < ELEMENTS; i++) {
+        for (int k = 0; k < n; k++) {
             try {
-                if (i % (ELEMENTS / NUMPOINTS) == 0 && numLength < NUMPOINTS) {
-                    actualTime = System.nanoTime() - startTime;
-                    computacionalOn[numLength] = new Point2D.Double(i, (actualTime / 10000000));
-                    numLength++;
-                    //System.out.println("Lmao num elem: " + numLength);
-                }
                 Thread.sleep(0, 1);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("Lineal end");
+
+        return System.nanoTime() - startTime;
+
+    }
+
+    public Point2D[] lineal() {
+
+
+        computacionalOn[0] = new Point2D.Double(0, 0);
+        int numLength = 1;
+        for (int i = 1; i < NUMPOINTS; i++) {
+            int numElementsActual = i * (ELEMENTS / NUMPOINTS);
+            double time = lineal(numElementsActual);
+
+            computacionalOn[numLength] = new Point2D.Double(numElementsActual, (time / 10000000));
+            numLength++;
+
+        }
+        System.out.println("end lineal");
         return computacionalOn;
     }
 
@@ -74,7 +92,7 @@ public class Model implements PerEsdeveniments {
 
     public Point2D[] cuadratic() {
 
-        Point2D[] computacionalOn2 = new Point2D[NUMPOINTS];
+
         computacionalOn2[0] = new Point2D.Double(0, 0);
         int numLength = 1;
 
@@ -82,12 +100,9 @@ public class Model implements PerEsdeveniments {
             int numElementsActual = i * (ELEMENTS / NUMPOINTS);
             double time = cuadratic(numElementsActual);
             computacionalOn2[numLength++] = new Point2D.Double(numElementsActual, (time / 10000000));
-            System.out.println("Lmao num elem: " + i);
 
         }
 
-        System.out.println(
-                "cuadractic end");
         return computacionalOn2;
     }
 
@@ -112,7 +127,7 @@ public class Model implements PerEsdeveniments {
 
     public Point2D[] logaritmic() {
 
-        Point2D[] computacionalOn3 = new Point2D[NUMPOINTS];
+
         computacionalOn3[0] = new Point2D.Double(0, 0);
         int numLength = 1;
 
@@ -121,12 +136,8 @@ public class Model implements PerEsdeveniments {
             double time = logaritmic(numElementsActual);
             computacionalOn3[numLength++] = new Point2D.Double(numElementsActual, (time / 10000000));
 
-            System.out.println("Lmao num elem: " + i);
-
         }
 
-        System.out.println(
-                "cuadractic end");
         return computacionalOn3;
     }
 
@@ -146,10 +157,77 @@ public class Model implements PerEsdeveniments {
         return ELEMENTS;
     }
 
+    public Point2D[] getComputacionalOn() {
+        return computacionalOn;
+    }
+
+    public void setComputacionalOn(Point2D[] computacionalOn) {
+        this.computacionalOn = computacionalOn;
+    }
+
+    public Point2D[] getComputacionalOn2() {
+        return computacionalOn2;
+    }
+
+    public void setComputacionalOn2(Point2D[] computacionalOn2) {
+        this.computacionalOn2 = computacionalOn2;
+    }
+
+    public Point2D[] getComputacionalOn3() {
+        return computacionalOn3;
+    }
+
+    public void setComputacionalOn3(Point2D[] computacionalOn3) {
+        this.computacionalOn3 = computacionalOn3;
+    }
+
+    public void vaciarArrays(){
+        computacionalOn = new Point2D[NUMPOINTS];
+        computacionalOn2 = new Point2D[NUMPOINTS];
+        computacionalOn3 = new Point2D[NUMPOINTS];
+        this.dibujando = false;
+    }
+
+    public boolean isLineal() {
+        return lineal;
+    }
+
+    public void setLineal(boolean lineal) {
+        this.lineal = lineal;
+    }
+
+    public boolean isCuadratic() {
+        return cuadratic;
+    }
+
+    public void setCuadratic(boolean cuadratic) {
+        this.cuadratic = cuadratic;
+    }
+
+    public boolean isLogartimic() {
+        return logartimic;
+    }
+
+    public void setLogartimic(boolean logartimic) {
+        this.logartimic = logartimic;
+    }
+    
+    
+    
     @Override
     public void notificar(String s) {
-        if (s.startsWith("IncGrau")) {
-
+        if (s.startsWith("dibuixar") && !this.dibujando) {
+            
+            if (computacionalOn[this.NUMPOINTS-1] == null && this.lineal) {
+                this.lineal();
+            }
+            if (computacionalOn2[this.NUMPOINTS-1] == null && this.cuadratic) {
+                this.cuadratic();
+            }
+            if (computacionalOn3[this.NUMPOINTS-1] == null && this.logartimic) {
+                this.logaritmic();
+            }
+            this.dibujando = true;
         }
     }
 }
